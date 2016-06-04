@@ -7,7 +7,7 @@ Make sure your [GOPATH](https://golang.org/doc/code.html#GOPATH) is ok.
 
 You could install boilerplate as usual golang module:
 ```shell
-go get -u github.com/user/awesome-project/...
+go get -u github.com/corpix/go-boilerplate/...
 ```
 
 But this is not so useful, **more often you want the project based on this boilerplate**.
