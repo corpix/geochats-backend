@@ -10,6 +10,6 @@ git clone "https://${package}" .
 rm -rf init.sh
 
 find . -type f | \
-    xargs perl -p -i -e "s|${package}|${pwd/$GOPATH\/src\//}|g"
+    xargs perl -p -i -e "s|${package}|${cwd/$GOPATH\/src\//}|g"
 
 echo Done.
