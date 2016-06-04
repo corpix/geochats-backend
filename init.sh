@@ -21,6 +21,7 @@ find . -type f | \
 
 perl -p -i -e "s|${boiler_package_base}|${package_base}|g" GNUmakefile
 perl -p -i -e "s|${boiler_package_name}|${package_name}|g" GNUmakefile
+perl -p -i -e "s|${boiler_package_name}|${package_name}|g" README.md
 
 mv "${boiler_package_name}" "${package_name}"
 
