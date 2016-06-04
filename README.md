@@ -2,6 +2,9 @@ go-boilerplate
 --------------
 This is a golang headless project boilerplate.
 
+# Usecases
+* Quick way to bootstrap a golang tool or server project
+
 # Install
 Make sure your [GOPATH](https://golang.org/doc/code.html#GOPATH) is ok.
 
@@ -29,8 +32,6 @@ curl -Ls https://raw.githubusercontent.com/corpix/go-boilerplate/0247ae4d8164260
 You are done!
 
 # Usage example
-
-# Usecases
 
 # Hack on
 
