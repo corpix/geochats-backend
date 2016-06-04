@@ -33,6 +33,50 @@ You are done!
 
 # Usage example
 
-# Hack on
+``` shell
+go-boilerplate -h
+NAME:
+   go-boilerplate - APP_USAGE
 
-# Contribute
+USAGE:
+   go-boilerplate [global options] command [command options] [arguments...]
+
+AUTHOR(S):
+   AUTHOR_NAME <AUTHOR_EMAIL>
+
+COMMANDS:
+     greet, g  greets the user
+
+GLOBAL OPTIONS:
+   --debug                      debug mode [$DEBUG]
+   --log-level value, -l value  log level(debug, info, warn, error, fatal, panic) (default: "info")
+   --log-file value             log file to log entries to
+   --log-file-mode value        octal mode for log file (default: 384)
+   --log-formatter value        log formatter to use(available: json or none)
+   --config value               path to configuration file (default: "config.xml")
+   --help, -h                   show help
+   --version, -v                print the version
+```
+
+# Hack on it
+
+* Fork this project
+* Clone it
+* Make a branch
+* Hack on it!
+* Test it
+* Push your fork
+* Pull request your awesome feature or fix!
+
+``` shellsession
+mkdir -p $GOPATH/src/github.com/$USER
+git clone git@github.com:$USER/go-boilerplate.git $GOPATH/src/github.com/$USER
+cd $_
+git checkout -b awesome-feature
+# Hacking in progress ...
+make test
+git add .
+git commit -m 'Added awesome feature for ...'
+git push
+# Create a pull request!
+```
