@@ -23,7 +23,7 @@ cd github.com/$USER/my-awesome-project
 On Linux/OS X:
 
 ``` shell
-curl -Ls https://raw.githubusercontent.com/corpix/go-boilerplate/709496432ae2c60ac3f9727c544023335396c24a/init.sh | bash
+curl -Ls https://raw.githubusercontent.com/corpix/go-boilerplate/0247ae4d8164260aa6e6ed02bef17c4d39cc2c67/init.sh | bash
 ```
 
 You are done!
