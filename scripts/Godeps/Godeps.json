@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/corpix/geochats-backend",
+	"ImportPath": "github.com/corpix/geochats-backend/scripts",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v62",
 	"Deps": []

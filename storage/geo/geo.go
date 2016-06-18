@@ -1,69 +1,80 @@
 package geo
 
 import (
+	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/corpix/geochats-backend/config"
 	"github.com/corpix/geochats-backend/database"
 	"github.com/corpix/geochats-backend/entity"
-	"gopkg.in/redis.v3"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	"net/url"
+)
+
+const (
+	// CollectionName is a namespace for data storage
+	CollectionName = "geo"
+
+	// MaxPointsInArea limits the maximum points in area to get from database
+	MaxPointsInArea = 100
 )
 
 // GeoStorage represents a struct that works with geo data storage
 type GeoStorage struct {
-	database *redis.Client
+	database   *mgo.Database
+	collection *mgo.Collection
+}
+
+// AddPoint stores a new Point in the storage
+func (gs *GeoStorage) AddPoint(point *entity.Point) (*entity.Point, error) {
+	if point == nil {
+		return nil, errors.New("AddPoint: point is nil")
+	}
+
+	point.ID = bson.NewObjectId()
+	point.Title = url.QueryEscape(point.Title)
+
+	err := gs.collection.Insert(point)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("AddPoint: %+v", point)
+	return point, nil
 }
 
 // GetPointsInArea retrieves point in the specified area from storage
-func (gs *GeoStorage) GetPointsInArea(area entity.Area) ([]entity.Point, error) {
-	return []entity.Point{
-		{
-			ID:    "deadbeef1",
-			Title: "Поговори со мной",
-			Geo: entity.Geo{
-				Latitude:  55.752141,
-				Longitude: 37.6143558,
+func (gs *GeoStorage) GetPointsInArea(area *entity.Area) ([]entity.Point, error) {
+	if area == nil {
+		return nil, errors.New("GetPointsInArea: area is nil")
+	}
+	log.Debugf(
+		"geo.latitude gt %+v lt %+v geo.longitude gt %+v lt %+v",
+		area.Latitude-area.LatitudeDelta,
+		area.Latitude+area.LatitudeDelta,
+		area.Longitude-area.LongitudeDelta,
+		area.Longitude+area.LongitudeDelta,
+	)
+	iter := gs.collection.Find(
+		bson.M{
+			"geo.latitude": bson.M{
+				"$gt": area.Latitude - area.LatitudeDelta,
+				"$lt": area.Latitude + area.LatitudeDelta,
+			},
+			"geo.longitude": bson.M{
+				"$gt": area.Longitude - area.LongitudeDelta,
+				"$lt": area.Longitude + area.LongitudeDelta,
 			},
 		},
-		{
-			ID:    "deadbeef2",
-			Title: "Ололо",
-			Geo: entity.Geo{
-				Latitude:  55.752141,
-				Longitude: 37.6143558,
-			},
-		},
-		{
-			ID:    "deadbeef3",
-			Title: "Я в домике",
-			Geo: entity.Geo{
-				Latitude:  55.75111,
-				Longitude: 37.613486,
-			},
-		},
-		{
-			ID:    "deadbeef4",
-			Title: "Пыщ пыщ",
-			Geo: entity.Geo{
-				Latitude:  55.751038,
-				Longitude: 37.609066,
-			},
-		},
-		{
-			ID:    "deadbeef5",
-			Title: "Пепяка ололо, Онотоле попячься!",
-			Geo: entity.Geo{
-				Latitude:  55.755216,
-				Longitude: 37.611684,
-			},
-		},
-		{
-			ID:    "deadbeef6",
-			Title: "test",
-			Geo: entity.Geo{
-				Latitude:  55.755192,
-				Longitude: 37.619923,
-			},
-		},
-	}, nil
+	).Limit(MaxPointsInArea).Iter()
+
+	point := entity.Point{}
+	points := []entity.Point{}
+	for iter.Next(&point) {
+		points = append(points, point)
+	}
+
+	return points, nil
 }
 
 // New creates a new geo storage instance
@@ -73,5 +84,8 @@ func New(conf *config.Config) (*GeoStorage, error) {
 		return nil, err
 	}
 
-	return &GeoStorage{db}, nil
+	return &GeoStorage{
+		database:   db,
+		collection: db.C(CollectionName),
+	}, nil
 }

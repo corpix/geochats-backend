@@ -2,8 +2,9 @@ package config
 
 //Config represents global configuration of application
 type Config struct {
-	DatabaseAddr string
 	ListenAddr   string
+	DatabaseAddr string
+	DatabaseName string
 }
 
 var c *Config

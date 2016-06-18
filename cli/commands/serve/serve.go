@@ -24,9 +24,15 @@ var (
 	Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "database-addr, d",
-			Value:  "127.0.0.1:6379",
+			Value:  "mongodb://127.0.0.1:27017",
 			EnvVar: "DATABASE_ADDR",
 			Usage:  "database addr to connect to",
+		},
+		cli.StringFlag{
+			Name:   "database-name, n",
+			Value:  "geochats",
+			EnvVar: "DATABASE_NAME",
+			Usage:  "database name to store data in",
 		},
 		cli.StringFlag{
 			Name:   "listen-addr, l",
@@ -42,6 +48,7 @@ func ServeAction(ctx *cli.Context) error {
 	conf := &config.Config{
 		ListenAddr:   ctx.String("listen-addr"),
 		DatabaseAddr: ctx.String("database-addr"),
+		DatabaseName: ctx.String("database-name"),
 	}
 	config.Set(conf)
 

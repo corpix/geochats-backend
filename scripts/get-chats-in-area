@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -x
+set -e
+curl \
+    -vv \
+    -XGET \
+    http://127.0.0.1:3000/api/v1/geo/55.752$(shuf -i 100-999 -n 1),37.6143$(shuf -i 100-999 -n 1),0.999,0.999
