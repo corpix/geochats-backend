@@ -65,7 +65,7 @@ func Run() {
 	app.Usage = "APP_USAGE"
 	app.Version = fmt.Sprintf("%s", version)
 	app.Authors = []cli.Author{
-		cli.Author{Name: "AUTHOR_NAME", Email: "AUTHOR_EMAIL"},
+		cli.Author{Name: "Dmitry Moskowski", Email: "me@corpix.ru"},
 	}
 	app.Flags = rootFlags
 	app.Before = appBefore

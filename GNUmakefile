@@ -10,7 +10,7 @@ LDFLAGS = \
 
 -include misc.mk
 -include release.mk
-.PHONY: all $(NAME) release.mk release test tools
+.PHONY: all $(NAME) release.mk release test tools save
 all:
 	go get github.com/tools/godep
 	go get github.com/rogpeppe/godef
@@ -39,3 +39,5 @@ test:
 	go test -v ./...
 lint:
 	gometalinter --deadline=5m --concurrency=2 --vendor ./...
+save:
+	godep save $(PKG)/...

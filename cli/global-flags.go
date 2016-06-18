@@ -31,10 +31,5 @@ var (
 			Value: "",
 			Usage: "log formatter to use(available: json or none)",
 		},
-		cli.StringFlag{
-			Name:  "config",
-			Value: "config.xml",
-			Usage: "path to configuration file",
-		},
 	}
 )
