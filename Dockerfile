@@ -12,4 +12,4 @@ RUN apt-get update && apt-get install -y --force-yes libsasl2-dev \
 
 EXPOSE 3000
 
-CMD ["/usr/bin/geochats-backend"]
+CMD ["/usr/bin/geochats-backend", "serve"]
