@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
-NAME = go-boilerplate
+NAME = geochats-backend
 PKG  = github.com/corpix/$(NAME)
 
 VERSION = $(shell date +'%Y%m%d%H').$(shell git rev-parse --short=8 HEAD)

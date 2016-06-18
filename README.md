@@ -1,4 +1,4 @@
-go-boilerplate
+geochats-backend
 --------------
 This is a golang headless project boilerplate.
 
@@ -10,7 +10,7 @@ Make sure your [GOPATH](https://golang.org/doc/code.html#GOPATH) is ok.
 
 You could install boilerplate as usual golang module:
 ```shell
-go get -u github.com/corpix/go-boilerplate/...
+go get -u github.com/corpix/geochats-backend/...
 ```
 
 But this is not so useful, **more often you want the project based on this boilerplate**.
@@ -26,7 +26,7 @@ cd github.com/$USER/my-awesome-project
 On Linux/OS X:
 
 ``` shell
-curl -Ls https://raw.githubusercontent.com/corpix/go-boilerplate/0247ae4d8164260aa6e6ed02bef17c4d39cc2c67/init.sh | bash
+curl -Ls https://raw.githubusercontent.com/corpix/geochats-backend/0247ae4d8164260aa6e6ed02bef17c4d39cc2c67/init.sh | bash
 ```
 
 You are done!
@@ -34,12 +34,12 @@ You are done!
 # Usage example
 
 ``` shell
-go-boilerplate -h
+geochats-backend -h
 NAME:
-   go-boilerplate - APP_USAGE
+   geochats-backend - APP_USAGE
 
 USAGE:
-   go-boilerplate [global options] command [command options] [arguments...]
+   geochats-backend [global options] command [command options] [arguments...]
 
 AUTHOR(S):
    AUTHOR_NAME <AUTHOR_EMAIL>
@@ -70,7 +70,7 @@ GLOBAL OPTIONS:
 
 ``` shellsession
 mkdir -p $GOPATH/src/github.com/$USER
-git clone git@github.com:$USER/go-boilerplate.git $GOPATH/src/github.com/$USER
+git clone git@github.com:$USER/geochats-backend.git $GOPATH/src/github.com/$USER
 cd $_
 git checkout -b awesome-feature
 # Hacking in progress ...

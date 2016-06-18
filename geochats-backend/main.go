@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/corpix/go-boilerplate/cli"
+	"github.com/corpix/geochats-backend/cli"
 )
 
 func main() {

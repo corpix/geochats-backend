@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/corpix/go-boilerplate/cli/commands/greet"
+	"github.com/corpix/geochats-backend/cli/commands/greet"
 	"github.com/urfave/cli"
 )
 
