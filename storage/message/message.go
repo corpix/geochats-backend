@@ -9,7 +9,7 @@ import (
 	"github.com/corpix/geochats-backend/pkg/timestamp"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"net/url"
+	//"net/url"
 	"time"
 )
 
