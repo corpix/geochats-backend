@@ -13,8 +13,7 @@ type Geo struct {
 // Point represents a uniquely addressable point on the map
 // Eg, the point that has an ID as a primary key and some data associated with it(title, ...)
 type Point struct {
-	ID    bson.ObjectId `json:"id",bson:"_id,omitempty",hash:"ignore",valid:"ascii,required"`
-	Title string        `json:"title",bson:"title",hash:"ignore",valid:",required"`
+	ID bson.ObjectId `json:"id",bson:"_id,omitempty",hash:"ignore",valid:"ascii,required"`
 	Geo
 }
 

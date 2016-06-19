@@ -25,9 +25,10 @@ type ChatHandlers struct {
 func (hs *ChatHandlers) GetChat(resp http.ResponseWriter, req *http.Request) {
 	helpers.JSONResponse(resp)
 	defer helpers.MustCloseBody(req)
+
 	//vars := mux.Vars(req)
 	//id := vars["id"]
-	return
+
 }
 
 // GetChatMessages handles a GET request and

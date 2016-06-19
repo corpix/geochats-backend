@@ -1,14 +1,14 @@
 package chat
 
 import (
-	//"errors"
-	//log "github.com/Sirupsen/logrus"
+	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/corpix/geochats-backend/config"
 	"github.com/corpix/geochats-backend/database"
 	"github.com/corpix/geochats-backend/entity"
 	"gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
-	//"net/url"
+	"gopkg.in/mgo.v2/bson"
+	"net/url"
 )
 
 const (
@@ -26,8 +26,27 @@ type ChatStorage struct {
 	collection *mgo.Collection
 }
 
-// GetChatMessages
-func GetChatMessages(id string, limit int) ([]entity.Message, error) {
+// AddChat creates a new chat
+func (cs *ChatStorage) AddChat(chat *entity.Chat) (*entity.Chat, error) {
+	if chat == nil {
+		return nil, errors.New("AddChat: chat is nil")
+	}
+
+	chatCopy := *chat
+	chatCopy.ID = bson.NewObjectId()
+	chatCopy.Title = url.QueryEscape(chatCopy.Title)
+
+	err := cs.collection.Insert(chatCopy)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("AddChat: %+v", chatCopy)
+	return &chatCopy, nil
+}
+
+// GetChatMessages retrieves chat messages with specified limit and offset from database
+func (cs *ChatStorage) GetChatMessages(id string, limit int) ([]entity.Message, error) {
 	return nil, nil
 }
 

@@ -6,7 +6,8 @@ import (
 	"github.com/corpix/geochats-backend/api/helpers"
 	"github.com/corpix/geochats-backend/config"
 	"github.com/corpix/geochats-backend/entity"
-	storage "github.com/corpix/geochats-backend/storage/geo"
+	chatStorage "github.com/corpix/geochats-backend/storage/chat"
+	geoStorage "github.com/corpix/geochats-backend/storage/geo"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -19,8 +20,9 @@ const (
 
 // GeoHandlers represents an HTTP handlers that works with geo data
 type GeoHandlers struct {
-	storage *storage.GeoStorage
-	router  *mux.Router
+	geoStorage  *geoStorage.GeoStorage
+	chatStorage *chatStorage.ChatStorage
+	router      *mux.Router
 }
 
 // GetGeo handles a GET request to the geo endpoint
@@ -59,7 +61,7 @@ func (hs *GeoHandlers) GetGeo(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	points, err := hs.storage.GetPointsInArea(area)
+	points, err := hs.geoStorage.GetPointsInArea(area)
 	if err != nil {
 		panic(err)
 	}
@@ -70,39 +72,42 @@ func (hs *GeoHandlers) GetGeo(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// PostGeo handles a POST request to the geo endpoint
-// and adds a new geo point to the database
-func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
-	defer helpers.MustCloseBody(req)
+func (hs *GeoHandlers) consumePoint(req *http.Request) *entity.Point {
 	var err error
 
-	helpers.JSONResponse(resp)
+	point := &entity.Point{}
 
-	userProvidenPoint := &entity.Point{}
-	err = json.NewDecoder(req.Body).Decode(userProvidenPoint)
+	err = json.NewDecoder(req.Body).Decode(point)
 	if err != nil {
 		panic(err)
 	}
 
-	valid, err := govalidator.ValidateStruct(userProvidenPoint)
+	return point
+}
+
+func (hs *GeoHandlers) validatePoint(point *entity.Point) bool {
+	valid, err := govalidator.ValidateStruct(point)
 	if err != nil {
 		panic(err)
 	}
-	if !valid {
-		resp.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	createdPoint, err := hs.storage.AddPoint(userProvidenPoint)
+	return valid
+}
+
+func (hs *GeoHandlers) validateChat(chat *entity.Chat) bool {
+	valid, err := govalidator.ValidateStruct(chat)
 	if err != nil {
 		panic(err)
 	}
-	if createdPoint == nil {
-		resp.WriteHeader(http.StatusConflict)
-		return
-	}
 
-	resp.WriteHeader(http.StatusCreated)
+	return valid
+}
+
+func (hs *GeoHandlers) createPoint(point *entity.Point, resp http.ResponseWriter) *entity.Point {
+	createdPoint, err := hs.geoStorage.AddPoint(point)
+	if err != nil {
+		panic(err)
+	}
 
 	retLocation, err := hs.router.Get("get-chat").URL("id", createdPoint.ID.Hex())
 	if err != nil {
@@ -114,16 +119,64 @@ func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
+	return createdPoint
+}
+
+func (hs *GeoHandlers) addChatAtPoint(chat *entity.Chat, point *entity.Point) *entity.Chat {
+	chatCopy := *chat
+	chatCopy.PointID = point.ID
+
+	createdChat, err := hs.chatStorage.AddChat(&chatCopy)
+	if err != nil {
+		panic(err)
+	}
+
+	return createdChat
+}
+
+// PostGeo handles a POST request to the geo endpoint
+// and adds a new geo point to the database
+func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
+	defer helpers.MustCloseBody(req)
+	helpers.JSONResponse(resp)
+
+	userProvidenPoint := hs.consumePoint(req)
+	valid := hs.validatePoint(userProvidenPoint)
+	if !valid {
+		resp.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	createdPoint := hs.createPoint(userProvidenPoint, resp)
+
+	chat := &entity.Chat{Title: "No name"}
+	valid = hs.validateChat(chat)
+	if !valid {
+		resp.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	hs.addChatAtPoint(chat, createdPoint)
+
+	resp.WriteHeader(http.StatusCreated)
 }
 
 // Bind mounts API endpoints for geo
 func Bind(router *mux.Router) error {
-	store, err := storage.New(config.Get())
+	geoStore, err := geoStorage.New(config.Get())
+	if err != nil {
+		return err
+	}
+	chatStore, err := chatStorage.New(config.Get())
 	if err != nil {
 		return err
 	}
 
-	handlers := GeoHandlers{store, router}
+	handlers := GeoHandlers{
+		geoStorage:  geoStore,
+		chatStorage: chatStore,
+		router:      router,
+	}
 
 	router.
 		HandleFunc(PathPrefix, handlers.PostGeo).

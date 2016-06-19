@@ -8,7 +8,6 @@ import (
 	"github.com/corpix/geochats-backend/entity"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"net/url"
 )
 
 const (
@@ -31,16 +30,16 @@ func (gs *GeoStorage) AddPoint(point *entity.Point) (*entity.Point, error) {
 		return nil, errors.New("AddPoint: point is nil")
 	}
 
-	point.ID = bson.NewObjectId()
-	point.Title = url.QueryEscape(point.Title)
+	pointCopy := *point
+	pointCopy.ID = bson.NewObjectId()
 
-	err := gs.collection.Insert(point)
+	err := gs.collection.Insert(pointCopy)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("AddPoint: %+v", point)
-	return point, nil
+	log.Debugf("AddPoint: %+v", pointCopy)
+	return &pointCopy, nil
 }
 
 // GetPointsInArea retrieves point in the specified area from storage
