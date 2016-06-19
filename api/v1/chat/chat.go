@@ -1,11 +1,11 @@
 package chat
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	//"github.com/asaskevich/govalidator"
 	"github.com/corpix/geochats-backend/api/helpers"
 	"github.com/corpix/geochats-backend/config"
-	storage "github.com/corpix/geochats-backend/storage/chat"
+	chatStorage "github.com/corpix/geochats-backend/storage/chat"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -17,7 +17,7 @@ const (
 
 // ChatHandlers represents an HTTP handlers that works with chats
 type ChatHandlers struct {
-	storage *storage.ChatStorage
+	chatStorage *chatStorage.ChatStorage
 }
 
 // GetChat handles a GET request and
@@ -26,9 +26,22 @@ func (hs *ChatHandlers) GetChat(resp http.ResponseWriter, req *http.Request) {
 	helpers.JSONResponse(resp)
 	defer helpers.MustCloseBody(req)
 
-	//vars := mux.Vars(req)
-	//id := vars["id"]
+	var err error
 
+	id := mux.Vars(req)["id"]
+	chat, err := hs.chatStorage.GetChat(id)
+	if err != nil {
+		panic(err)
+	}
+	if chat == nil {
+		resp.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	err = json.NewEncoder(resp).Encode(chat)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // GetChatMessages handles a GET request and
@@ -41,12 +54,14 @@ func (hs *ChatHandlers) GetChatMessages(resp http.ResponseWriter, req *http.Requ
 
 // Bind mounts API endpoints for chat
 func Bind(router *mux.Router) error {
-	store, err := storage.New(config.Get())
+	chatStore, err := chatStorage.New(config.Get())
 	if err != nil {
 		return err
 	}
 
-	handlers := ChatHandlers{store}
+	handlers := ChatHandlers{
+		chatStorage: chatStore,
+	}
 
 	r := router.PathPrefix(PathPrefix).Subrouter()
 

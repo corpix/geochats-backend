@@ -45,6 +45,18 @@ func (cs *ChatStorage) AddChat(chat *entity.Chat) (*entity.Chat, error) {
 	return &chatCopy, nil
 }
 
+// GetChat retrieves a concrete chat from database
+func (cs *ChatStorage) GetChat(id string) (*entity.Chat, error) {
+	chat := &entity.Chat{}
+	err := cs.collection.FindId(id).One(chat)
+	switch err {
+	case mgo.ErrNotFound:
+		return nil, nil
+	default:
+		return nil, err
+	}
+}
+
 // GetChatMessages retrieves chat messages with specified limit and offset from database
 func (cs *ChatStorage) GetChatMessages(id string, limit int) ([]entity.Message, error) {
 	return nil, nil
