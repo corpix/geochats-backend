@@ -20,6 +20,6 @@ type Point struct {
 // Area represents an area on the map
 type Area struct {
 	Geo
-	LatitudeDelta  float64 `json:"latitudeDelta" bson:"latitudeDelta" valid:"numeric,required"`
-	LongitudeDelta float64 `json:"longitudeDelta" bson:"longitudeDelta" valid:"numeric,required"`
+	LatitudeDelta  float64 `json:"latitudeDelta" bson:"latitudeDelta" valid:",required"`
+	LongitudeDelta float64 `json:"longitudeDelta" bson:"longitudeDelta" valid:",required"`
 }
