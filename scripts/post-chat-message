@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -x
+set -e
+
+if [ -z "$1" ]
+then
+    echo "Usage: $0 <chat-id>" >2
+    exit 1
+fi
+
+curl \
+    -vv \
+    -XPOST \
+    -H'content-type: application/json' \
+    -d '{"text": "this is a test"}' \
+    http://127.0.0.1:3000/api/v1/chat/$1/message

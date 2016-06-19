@@ -25,6 +25,50 @@ type GeoHandlers struct {
 	router      *mux.Router
 }
 
+func (hs *GeoHandlers) consumePoint(req *http.Request) *entity.Point {
+	var err error
+
+	point := &entity.Point{}
+
+	err = json.NewDecoder(req.Body).Decode(point)
+	if err != nil {
+		panic(err)
+	}
+
+	return point
+}
+
+func (hs *GeoHandlers) validatePoint(point *entity.Point) error {
+	_, err := govalidator.ValidateStruct(point)
+	return err
+}
+
+func (hs *GeoHandlers) validateChat(chat *entity.Chat) error {
+	_, err := govalidator.ValidateStruct(chat)
+	return err
+}
+
+func (hs *GeoHandlers) createPoint(point *entity.Point, resp http.ResponseWriter) *entity.Point {
+	createdPoint, err := hs.geoStorage.AddPoint(point)
+	if err != nil {
+		panic(err)
+	}
+
+	return createdPoint
+}
+
+func (hs *GeoHandlers) addChatAtPoint(chat *entity.Chat, point *entity.Point) *entity.Chat {
+	chatCopy := *chat
+	chatCopy.PointID = point.ID
+
+	createdChat, err := hs.chatStorage.AddChat(&chatCopy)
+	if err != nil {
+		panic(err)
+	}
+
+	return createdChat
+}
+
 // GetGeo handles a GET request to the geo endpoint
 // And retrieves a geopoints that presented in some area
 func (hs *GeoHandlers) GetGeo(resp http.ResponseWriter, req *http.Request) {
@@ -52,12 +96,9 @@ func (hs *GeoHandlers) GetGeo(resp http.ResponseWriter, req *http.Request) {
 		LongitudeDelta: areaMap["longitudeDelta"],
 	}
 
-	valid, err := govalidator.ValidateStruct(area)
+	_, err = govalidator.ValidateStruct(area)
 	if err != nil {
-		panic(err)
-	}
-	if !valid {
-		resp.WriteHeader(http.StatusBadRequest)
+		helpers.ValidationError(resp, err)
 		return
 	}
 
@@ -72,43 +113,30 @@ func (hs *GeoHandlers) GetGeo(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (hs *GeoHandlers) consumePoint(req *http.Request) *entity.Point {
-	var err error
+// PostGeo handles a POST request to the geo endpoint
+// and adds a new geo point to the database
+func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
+	defer helpers.MustCloseBody(req)
+	helpers.JSONResponse(resp)
 
-	point := &entity.Point{}
-
-	err = json.NewDecoder(req.Body).Decode(point)
+	userProvidenPoint := hs.consumePoint(req)
+	err := hs.validatePoint(userProvidenPoint)
 	if err != nil {
-		panic(err)
+		helpers.ValidationError(resp, err)
+		return
 	}
 
-	return point
-}
+	createdPoint := hs.createPoint(userProvidenPoint, resp)
 
-func (hs *GeoHandlers) validatePoint(point *entity.Point) bool {
-	valid, err := govalidator.ValidateStruct(point)
+	chat := &entity.Chat{Title: "No name"}
+	err = hs.validateChat(chat)
 	if err != nil {
-		panic(err)
+		helpers.ValidationError(resp, err)
+		return
 	}
+	hs.addChatAtPoint(chat, createdPoint)
 
-	return valid
-}
-
-func (hs *GeoHandlers) validateChat(chat *entity.Chat) bool {
-	valid, err := govalidator.ValidateStruct(chat)
-	if err != nil {
-		panic(err)
-	}
-
-	return valid
-}
-
-func (hs *GeoHandlers) createPoint(point *entity.Point, resp http.ResponseWriter) *entity.Point {
-	createdPoint, err := hs.geoStorage.AddPoint(point)
-	if err != nil {
-		panic(err)
-	}
-
+	resp.WriteHeader(http.StatusCreated)
 	retLocation, err := hs.router.Get("get-chat").URL("id", createdPoint.ID.Hex())
 	if err != nil {
 		panic(err)
@@ -119,46 +147,6 @@ func (hs *GeoHandlers) createPoint(point *entity.Point, resp http.ResponseWriter
 	if err != nil {
 		panic(err)
 	}
-
-	return createdPoint
-}
-
-func (hs *GeoHandlers) addChatAtPoint(chat *entity.Chat, point *entity.Point) *entity.Chat {
-	chatCopy := *chat
-	chatCopy.PointID = point.ID
-
-	createdChat, err := hs.chatStorage.AddChat(&chatCopy)
-	if err != nil {
-		panic(err)
-	}
-
-	return createdChat
-}
-
-// PostGeo handles a POST request to the geo endpoint
-// and adds a new geo point to the database
-func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
-	defer helpers.MustCloseBody(req)
-	helpers.JSONResponse(resp)
-
-	userProvidenPoint := hs.consumePoint(req)
-	valid := hs.validatePoint(userProvidenPoint)
-	if !valid {
-		resp.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	createdPoint := hs.createPoint(userProvidenPoint, resp)
-
-	chat := &entity.Chat{Title: "No name"}
-	valid = hs.validateChat(chat)
-	if !valid {
-		resp.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	hs.addChatAtPoint(chat, createdPoint)
-
-	resp.WriteHeader(http.StatusCreated)
 }
 
 // Bind mounts API endpoints for geo

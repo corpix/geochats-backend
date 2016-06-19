@@ -14,10 +14,6 @@ import (
 const (
 	// CollectionName is a namespace for data storage
 	CollectionName = "chat"
-
-	// MaxMessagesPerRetrieval limits the maximum amount of messages that
-	// could be retrieved via single query to the database
-	MaxMessagesPerRetrieval = 50
 )
 
 // ChatStorage represents a struct that works with chat data
@@ -32,11 +28,13 @@ func (cs *ChatStorage) AddChat(chat *entity.Chat) (*entity.Chat, error) {
 		return nil, errors.New("AddChat: chat is nil")
 	}
 
+	var err error
+
 	chatCopy := *chat
 	chatCopy.ID = bson.NewObjectId()
 	chatCopy.Title = url.QueryEscape(chatCopy.Title)
 
-	err := cs.collection.Insert(chatCopy)
+	err = cs.collection.Insert(chatCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -48,18 +46,18 @@ func (cs *ChatStorage) AddChat(chat *entity.Chat) (*entity.Chat, error) {
 // GetChat retrieves a concrete chat from database
 func (cs *ChatStorage) GetChat(id string) (*entity.Chat, error) {
 	chat := &entity.Chat{}
-	err := cs.collection.FindId(id).One(chat)
-	switch err {
-	case mgo.ErrNotFound:
-		return nil, nil
-	default:
+	log.Debugf("GetChat: %+v", id)
+	// FindId is not working, looks like there is a bug
+	// Fuck labix!
+	err := cs.collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(chat)
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
-}
 
-// GetChatMessages retrieves chat messages with specified limit and offset from database
-func (cs *ChatStorage) GetChatMessages(id string, limit int) ([]entity.Message, error) {
-	return nil, nil
+	return chat, nil
 }
 
 // New creates a new geo storage instance
