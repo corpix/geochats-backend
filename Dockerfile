@@ -2,8 +2,8 @@ FROM golang:1.6.2
 MAINTAINER Dmitry Moskowski <me@corpix.ru>
 
 WORKDIR /go/src
-RUN apt-get update && apt-get install -y --force-yes libsasl2-dev \
-    && go get github.com/corpix/geochats-backend/... \
+RUN apt-get update && apt-get install -y --force-yes libsasl2-dev
+RUN go get github.com/corpix/geochats-backend/... \
     && cd github.com/corpix/geochats-backend \
     && go get -u github.com/tools/godep \
     && godep restore \
