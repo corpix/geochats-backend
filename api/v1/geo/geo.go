@@ -137,7 +137,7 @@ func (hs *GeoHandlers) PostGeo(resp http.ResponseWriter, req *http.Request) {
 	hs.addChatAtPoint(chat, createdPoint)
 
 	resp.WriteHeader(http.StatusCreated)
-	retLocation, err := hs.router.Get("get-chat").URL("id", createdPoint.ID.Hex())
+	retLocation, err := hs.router.Get("get-chat").URL("chatID", createdPoint.ID.Hex())
 	if err != nil {
 		panic(err)
 	}
