@@ -40,7 +40,8 @@ func (ms *MessageStorage) PostMessage(chatID string, message *entity.Message) (*
 	messageCopy.ID = bson.NewObjectId()
 	messageCopy.Date = timestamp.Timestamp(time.Now())
 	messageCopy.ChatID = bson.ObjectIdHex(chatID)
-	messageCopy.Text = url.QueryEscape(message.Text)
+	// FIXME: Find good way to escape this to work with RN
+	//messageCopy.Text = url.QueryEscape(message.Text)
 
 	err = ms.collection.Insert(messageCopy)
 	if err != nil {

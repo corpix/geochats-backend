@@ -4,7 +4,7 @@ MAINTAINER Dmitry Moskowski <me@corpix.ru>
 WORKDIR /go/src
 RUN apt-get update && apt-get install -y --force-yes libsasl2-dev
 
-ENV REV 0a33b9d
+ENV REV 1466347281
 
 RUN go get github.com/corpix/geochats-backend/... \
     && cd github.com/corpix/geochats-backend \
