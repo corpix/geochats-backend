@@ -46,9 +46,10 @@ var (
 // ServeAction is an entry point for the serve command of the API server
 func ServeAction(ctx *cli.Context) error {
 	conf := &config.Config{
-		ListenAddr:   ctx.String("listen-addr"),
-		DatabaseAddr: ctx.String("database-addr"),
-		DatabaseName: ctx.String("database-name"),
+		ListenAddr:             ctx.String("listen-addr"),
+		DatabaseAddr:           ctx.String("database-addr"),
+		DatabaseName:           ctx.String("database-name"),
+		DatabaseConnectTimeout: 5 * time.Second,
 	}
 	config.Set(conf)
 

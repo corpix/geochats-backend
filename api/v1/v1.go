@@ -1,14 +1,14 @@
 package v1
 
 import (
-	//"github.com/corpix/geochats-backend/api/v1/chats"
+	"github.com/corpix/geochats-backend/api/v1/chat"
 	"github.com/corpix/geochats-backend/api/v1/geo"
 	"github.com/gorilla/mux"
 )
 
 var endpointBinders = []func(*mux.Router) error{
 	geo.Bind,
-	//chats.Bind,
+	chat.Bind,
 }
 
 // Bind mounts API v1 endpoint

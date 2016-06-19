@@ -7,7 +7,10 @@ import (
 
 // NewClient creates a new mongo client
 func NewClient(conf *config.Config) (*mgo.Database, error) {
-	sess, err := mgo.Dial(conf.DatabaseAddr)
+	sess, err := mgo.DialWithTimeout(
+		conf.DatabaseAddr,
+		conf.DatabaseConnectTimeout,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -1,10 +1,15 @@
 package config
 
+import (
+	"time"
+)
+
 //Config represents global configuration of application
 type Config struct {
-	ListenAddr   string
-	DatabaseAddr string
-	DatabaseName string
+	ListenAddr             string
+	DatabaseAddr           string
+	DatabaseName           string
+	DatabaseConnectTimeout time.Duration
 }
 
 var c *Config

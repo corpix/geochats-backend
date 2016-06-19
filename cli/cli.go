@@ -77,6 +77,6 @@ func Run() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalf("Got an error initial run %+v", err)
+		log.Fatalf("Got an error on initial run: %+v", err)
 	}
 }
