@@ -12,5 +12,5 @@ curl \
     -vv \
     -XPOST \
     -H'content-type: application/json' \
-    -d '{"text": "this is a test"}' \
+    -d '{"name": "hello", "text": "this is a test"}' \
     http://127.0.0.1:3000/api/v1/chat/$1/message

@@ -6,9 +6,11 @@ import (
 	"github.com/corpix/geochats-backend/config"
 	"github.com/corpix/geochats-backend/database"
 	"github.com/corpix/geochats-backend/entity"
+	"github.com/corpix/geochats-backend/pkg/timestamp"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"net/url"
+	"time"
 )
 
 const (
@@ -36,6 +38,7 @@ func (ms *MessageStorage) PostMessage(chatID string, message *entity.Message) (*
 
 	messageCopy := *message
 	messageCopy.ID = bson.NewObjectId()
+	messageCopy.Date = timestamp.Timestamp(time.Now())
 	messageCopy.ChatID = bson.ObjectIdHex(chatID)
 	messageCopy.Text = url.QueryEscape(message.Text)
 
